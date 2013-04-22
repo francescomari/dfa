@@ -45,7 +45,7 @@ Creating a DFA with a non-valid definition will throw an `Error` with a hopefull
 
 ## Use the DFA
 
-A DFA can only recognize if a string of characters as valid based on the definition it was built with. To recognize a string of characters use the `accept()` method.
+A DFA can only recognize if a string of characters is valid based on the definition it was built with. To recognize a string of characters use the `accept()` method.
 
 ```javascript
 automaton.accept("");        // -> false, the empty string is not recognized
