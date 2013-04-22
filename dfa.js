@@ -96,4 +96,4 @@ exports.create = function (definition) {
             return definition.finals.indexOf(current) !== -1;
         }
     };
-}
+};
