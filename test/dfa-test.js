@@ -32,8 +32,6 @@ describe("dfa", function () {
     });
 
     describe("create()", function () {
-        
-
         it("should create a DFA with a correct definition", function () {
             assert.ok(create());
         });
