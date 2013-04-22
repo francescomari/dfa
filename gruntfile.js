@@ -1,12 +1,8 @@
 module.exports = function (grunt) {
     grunt.initConfig({
         jshint: {
-            main: {
-                src: ["dfa.js"]
-            },
-            test: {
-                src: ["test/*.js"]
-            }
+            main: ["dfa.js"],
+            test: ["test/*.js"]
         }
     });
 
