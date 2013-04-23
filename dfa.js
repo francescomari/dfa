@@ -1,11 +1,49 @@
+"use strict";
+
 exports.create = function (definition) {
     var error;
 
     function validate() {
-        var i, name, character, destination;
+        var error;
+
+        function forEachFinal(f) {
+            var i, result;
+
+            for (i = 0; i < definition.finals.length; i += 1) {
+                result = f(definition.finals[i]);
+
+                if (result) {
+                    return result;
+                }
+            }
+        }
+
+        function forEachTransition(f) {
+            var state, character, destination, result;
+
+            for (state in definition.states) {
+                if (definition.states.hasOwnProperty(state)) {
+                    for (character in definition.states[state]) {
+                        if (definition.states[state].hasOwnProperty(character)) {
+                            destination = definition.states[state][character];
+
+                            result = f(state, character, destination);
+
+                            if (result) {
+                                return result;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function isStateUndefined(name) {
+            return definition.states.hasOwnProperty(name) === false;
+        }
 
         // Definition is mandatory
-        
+
         if (!definition) {
             return "Invalid definition";
         }
@@ -36,35 +74,37 @@ exports.create = function (definition) {
 
         // Definition of start state must be specified
 
-        if (definition.start in definition.states === false) {
+        if (isStateUndefined(definition.start)) {
             return "The initial state has no definition";
         }
 
         // Definition of every final state must be specified
 
-        for (i = 0; i < definition.finals.length; i++) {
-            if (definition.finals[i] in definition.states === false) {
-                return "Final state '" + definition.finals[i] + "' has no definition";
+        error = forEachFinal(function (f) {
+            if (isStateUndefined(f)) {
+                return "Final state '" + f + "' has no definition";
             }
+        });
+
+        if (error) {
+            return error;
         }
 
-        for (name in definition.states) {
-            for (character in definition.states[name]) {
+        // Each state must process one character at a time and the destination must have a 
+        // definition
 
-                // Each state must process one character at a time
-
-                if (character.length !== 1) {
-                    return "Invalid character '" + character + "' for state '" + name + "'";
-                }
-
-                destination = definition.states[name][character];
-
-                // The destination for each state must have a definition
-
-                if (destination in definition.states === false) {
-                    return "State '" + name + "' wants to jump to non-existing state '" + destination + "'";
-                }
+        error = forEachTransition(function (state, character, destination) {
+            if (character.length !== 1) {
+                return "Invalid character '" + character + "' for state '" + state + "'";
             }
+
+            if (isStateUndefined(destination)) {
+                return "State '" + state + "' has a non-existing destination '" + destination + "'";
+            }
+        });
+
+        if (error) {
+            return error;
         }
 
         return null;
@@ -78,18 +118,16 @@ exports.create = function (definition) {
 
     return {
         accept: function (s) {
-            var i, current;
-
             if (typeof s !== "string") {
                 throw new Error("Input is not a string");
             }
 
-            current = definition.start;
+            var current = definition.start;
 
             // During the process, current can be undefined because of unrecognized character
             // for the current state. We can stop the loop as soon as current becomes undefined.
 
-            for (i = 0; i < s.length && current; i++) {
+            for (var i = 0; i < s.length && current; i += 1) {
                 current = definition.states[current][s[i]];
             }
 

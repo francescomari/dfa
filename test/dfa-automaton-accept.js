@@ -1,3 +1,5 @@
+"use strict";
+
 var dfa = require("../dfa");
 
 var automaton = dfa.create({
