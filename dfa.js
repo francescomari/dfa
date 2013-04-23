@@ -118,16 +118,18 @@ exports.create = function (definition) {
 
     return {
         accept: function (s) {
+            var current, i;
+
             if (typeof s !== "string") {
                 throw new Error("Input is not a string");
             }
 
-            var current = definition.start;
+            current = definition.start;
 
             // During the process, current can be undefined because of unrecognized character
             // for the current state. We can stop the loop as soon as current becomes undefined.
 
-            for (var i = 0; i < s.length && current; i += 1) {
+            for (i = 0; i < s.length && current; i += 1) {
                 current = definition.states[current][s[i]];
             }
 
